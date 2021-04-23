@@ -1,0 +1,13 @@
+﻿@using Mat_Kanban.ViewModels
+@model Role
+
+@{ }
+
+<div>
+    <form asp-controller="Roles" asp-action="CreateRole" method="post">
+        <label>Create new Role</label>
+        <input asp-for="@Model.Name" />
+        <input type="submit" value="Create" />
+
+    </form>
+</div>

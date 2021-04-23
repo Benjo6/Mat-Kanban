@@ -1,0 +1,87 @@
+﻿@model Mat_Kanban.ViewModels.BoardView
+
+@{
+    ViewData["Title"] = "Index";
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+
+<input type="hidden"
+       id="RequestVerificationToken"
+       name="RequestVerificationToken"
+       value="@GetAntiXsrfRequestToken()">
+
+<script>
+    $(function () {
+        $(".draggable").draggable({
+            revert: "invalid"
+        });
+        $('.column').droppable({
+            accept: '.draggable',
+            drop: function (event, ui) {
+                var dr = ui.draggable;
+                var drOn = $(this);
+                $(dr).detach().css({ top: 0, left: 0 }).appendTo(drOn);
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    url: "/api/Board/movecard",
+                    beforeSend: function (request) {
+                        request.setRequestHeader("RequestVerificationToken", $('#RequestVerificationToken').val());
+                    },
+                    data: JSON.stringify({ cardId: dr[0].id, columnId: dr[0].id }),
+                });
+            }
+        });
+    });
+</script>
+
+<div class="container">
+
+    <h4 style="text-align:center">@Model.Title</h4>
+
+    <div class="row">
+        <div class="col s10">
+            <a asp-controller="Board"
+               asp-action="AddCard"
+               asp-route-id="@Model.Id"
+               class="wave-effect waves-dark btn">
+                Add A Card
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var c in Model.Columns)
+        {
+            <div class="col m4">
+
+                <h3 style="text-align:center">@c.Title</h3>
+
+                <div class="column" style="min-height: 600px" id="@c.Id">
+
+                    @foreach (var ca in c.Cards)
+                    {
+                        <div class="card red darken-1 draggable" id="@ca.Id">
+                            <div class="card-content white-text">
+                                <p>
+                                    <a asp-controller="Card" asp-action="Details"
+                                       asp-route-id="@ca.Id" class="white-text">
+                                        @ca.Content
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

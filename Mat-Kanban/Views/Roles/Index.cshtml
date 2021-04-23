@@ -1,0 +1,36 @@
+﻿@using Mat_Kanban.ViewModels
+@model Display
+
+@{ }
+
+<div>
+    <h2>
+        Create User
+    </h2>
+    <div>
+        <form asp-controller="Roles" asp-action="CreateUser" method="post">
+            <label>User Email</label>
+            <input name="email" value="" />
+            <input type="submit" value="Create User" />
+        </form>
+    </div>
+</div>
+
+<div>
+    <div>
+        <h2>Role List</h2>
+        <ul>
+            @foreach (var role in Model.Roles)
+            {
+                <li>
+                    @role
+                </li>
+
+            }
+        </ul>
+    </div>
+    <partial name="_CreateRolePartial" model="new Role()">
+</div>
+<div>
+    <partial name="_AddUserToRolePartial" model="new RoleUser {Users= @Model.Users, Roles = @Model.Roles }">
+</div>
